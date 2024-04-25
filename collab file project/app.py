@@ -45,5 +45,3 @@ def predict():
         else:
             return "Prediction not available."
 
-if __name__ == '__main__':
-    app.run(debug=True)

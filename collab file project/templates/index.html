@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Prediction</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-image: url('/static/pexels-todd-trapani-488382-1382102.jpg');
+            background-size: cover;
+            background-position: center;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            animation: fadeInUp 1s ease forwards;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        form {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        input[type="text"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        .result-container {
+            display: none;
+            margin-top: 20px;
+        }
+
+        #predictedCrop {
+            font-weight: bold;
+        }
+
+        .error-message {
+            color: #f00;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Crop Prediction</h1>
+        <form id="cropForm">
+            <label for="N">Nitrogen:</label><br>
+            <input type="text" id="N" name="N" required pattern="\d+(\.\d+)?" title="Enter a valid number"><br>
+            <label for="P">Phosphorous:</label><br>
+            <input type="text" id="P" name="P" required pattern="\d+(\.\d+)?" title="Enter a valid number"><br>
+            <label for="K">Potassium:</label><br>
+            <input type="text" id="K" name="K" required pattern="\d+(\.\d+)?" title="Enter a valid number"><br>
+            <label for="temperature">Temperature:</label><br>
+            <input type="text" id="temperature" name="temperature" required pattern="\d+(\.\d+)?" title="Enter a valid number"><br>
+            <label for="humidity">Humidity:</label><br>
+            <input type="text" id="humidity" name="humidity" required pattern="\d+(\.\d+)?" title="Enter a valid number"><br>
+            <label for="ph">pH:</label><br>
+            <input type="text" id="ph" name="ph" required pattern="\d+(\.\d+)?" title="Enter a valid number"><br>
+            <label for="rainfall">Rainfall:</label><br>
+            <input type="text" id="rainfall" name="rainfall" required pattern="\d+(\.\d+)?" title="Enter a valid number"><br><br>
+            <input type="submit" value="Submit">
+            <div class="error-message" id="errorMessage"></div>
+        </form>
+        <div class="result-container" id="resultContainer">
+            <h2>Predicted Crop</h2>
+            <p>The predicted crop is: <span id="predictedCrop"></span></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('cropForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            var form = event.target;
+            var formData = new FormData(form);
+
+            fetch('/predict', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(data => {
+                document.getElementById('predictedCrop').textContent = data;
+                document.getElementById('resultContainer').style.display = 'block';
+                document.getElementById('errorMessage').textContent = '';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('errorMessage').textContent = 'An error occurred. Please try again later.';
+            });
+        });
+    </script>
+</body>
+</html>
